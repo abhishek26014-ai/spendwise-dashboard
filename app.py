@@ -80,31 +80,29 @@ total_spent = df['amount'].sum() if not df.empty else 0
 remaining = budget - total_spent
 
 if total_spent >= budget and budget > 0:
-    st.sidebar.error(f"Over Budget! Spent: ₹{total_spent:.2f} / ₹{budget:.2f}")
+    st.sidebar.error(f"Over Budget! Spent: ₹{total_spent:,.2f} / ₹{budget:,.2f}")
 else:
-    st.sidebar.success(f"Within Budget. Spent: ₹{total_spent:.2f} / ₹{budget:.2f}")
+    st.sidebar.success(f"Within Budget. Spent: ₹{total_spent:,.2f} / ₹{budget:,.2f}")
 
-# --- KPI METRIC CARDS ---
+# --- KPI METRIC CARDS (2x2 Grid for Wide Spacing) ---
 if not df.empty:
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-    
+    kpi1, kpi2 = st.columns(2)
     with kpi1:
-        st.metric("Total Spent", f"₹{total_spent:.2f}")
-        
+        st.metric("Total Spent", f"₹{total_spent:,.2f}")
     with kpi2:
-        st.metric("Budget Remaining", f"₹{remaining:.2f}" if remaining > 0 else "₹0.00")
+        st.metric("Budget Remaining", f"₹{remaining:,.2f}" if remaining > 0 else "₹0.00")
         
+    kpi3, kpi4 = st.columns(2)
     with kpi3:
         unique_days = df['date'].nunique()
         avg_daily = total_spent / unique_days if unique_days > 0 else 0
-        st.metric("Avg Daily Spend", f"₹{avg_daily:.2f}")
-        
+        st.metric("Avg Daily Spend", f"₹{avg_daily:,.2f}")
     with kpi4:
         today = date.today()
         _, days_in_month = calendar.monthrange(today.year, today.month)
         days_remaining = days_in_month - today.day + 1
         daily_power = remaining / days_remaining if remaining > 0 else 0
-        st.metric("Safe to Spend Today", f"₹{daily_power:.2f}")
+        st.metric("Safe to Spend Today", f"₹{daily_power:,.2f}")
 
 st.divider()
 
@@ -123,7 +121,7 @@ with st.expander("➕ Click to Add a New Expense", expanded=False):
     if st.button("Save Expense", use_container_width=True):
         if amount > 0:
             insert_expense(date_input, category, amount, note)
-            st.success(f"Success! Saved ₹{amount:.2f} for {category}.")
+            st.success(f"Success! Saved ₹{amount:,.2f} for {category}.")
             st.rerun() 
         else:
             st.error("Please enter an amount greater than 0.")
@@ -176,7 +174,7 @@ with col_ai:
             
             next_day_index = [[len(daily_df)]]
             predicted_amount = model.predict(next_day_index)[0]
-            st.info(f"Predicted next active day spending: **₹{max(0, round(predicted_amount, 2)):.2f}**")
+            st.info(f"Predicted next active day spending: **₹{max(0, round(predicted_amount, 2)):,.2f}**")
         else:
             st.warning("Need expenses on at least 2 different dates for AI predictions.")
     else:
